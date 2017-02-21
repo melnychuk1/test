@@ -7,9 +7,9 @@
  * @return {Element}
  */
 function createDivWithText(text) {
-    var el = document.createElement('DIV');
-    el.innerText = text;
-    return el;
+    let element = document.createElement('DIV');
+    element.innerText = text;
+    return element;
 }
 
 /**
@@ -49,8 +49,8 @@ function prepend(what, where) {
  * т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
-    var arr = [];
-    for (var i = 0; i < where.children.length - 1; i++) {
+    let arr = [];
+    for (let i = 0; i < where.children.length - 1; i++) {
         if (where.children[i].nextElementSibling.tagName === 'P'){
             arr.push(where.children[i]);
         }
@@ -67,8 +67,8 @@ function findAllPSiblings(where) {
  * @return {Array<string>}
  */
 function findError(where) {
-    var result = [];
-    for (var child of where.children) {
+    let result = [];
+    for (let child of where.children) {
         result.push(child.innerText);
     }
 
