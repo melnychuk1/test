@@ -8,6 +8,7 @@
  * @param {function} fn - обработчик
  */
 function addListener(eventName, target, fn) {
+    target.addEventListener(eventName, fn);
 }
 
 /**
@@ -18,6 +19,7 @@ function addListener(eventName, target, fn) {
  * @param {function} fn - обработчик
  */
 function removeListener(eventName, target, fn) {
+    target.removeEventListener(eventName, fn);
 }
 
 /**
@@ -36,6 +38,8 @@ function skipDefault(eventName, target) {
  * @param {Element} target - элемент, на который нужно добавить обработчик
  */
 function emulateClick(target) {
+    let event = new Event('click');
+    target.dispatchEvent(event);
 }
 
 /**
@@ -46,6 +50,11 @@ function emulateClick(target) {
  * @param {function} fn - функция, которую нужно вызвать при клике на элемент BUTTON внутри target
  */
 function delegate(target, fn) {
+    target.addEventListener('click', (e) => {
+        if(e.target.tagName == 'BUTTON') {
+            fn();
+        }
+    });
 }
 
 /**
@@ -58,6 +67,15 @@ function delegate(target, fn) {
  * @param {function} fn - обработчик
  */
 function once(target, fn) {
+    let el = false;
+    target.addEventListener('click', handler);
+    function handler() {
+        if (!el) {
+            fn();
+            el = true;
+            target.removeEventListener('click', handler);
+        }
+    }
 }
 
 export {
@@ -68,3 +86,11 @@ export {
     delegate,
     once
 };
+/*да, тут надо сделать, задачка не долгая, хоть и сложная_
+ суть в том, чтобы сначала назначить обработчик на функцию
+ а после срабатывания удалить через removeEventListener
+ сначала стоит ввести переменную, переключатель)
+ например var handler = false
+ и если она false - тогда назначить обработчик
+ и переобределить ее в true
+ а если она true - тогда удалить обработчик)*/
