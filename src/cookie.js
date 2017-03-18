@@ -24,7 +24,7 @@
  *
  * Запрещено использовать сторонние библиотеки. Разрешено пользоваться только тем, что встроено в браузер
  */
-import { createCookie, deleteCookie } from './index';
+import {createCookie, deleteCookie} from './index';
 /**
  * homeworkContainer - это контейнер для всех ваших домашних заданий
  * Если вы создаете новые html-элементы и добавляете их на страницу, то дабавляйте их только в этот контейнер
@@ -80,17 +80,18 @@ function getCookies() {
  * @param value - значение cookie
  */
 function createCookieTr(name, value) {
-    var tr = document.createElement('TR'),
+    let tr = document.createElement('TR'),
         tdName = document.createElement('TD'),
         tdValue = document.createElement('TD'),
         tdButton = document.createElement('TD'),
         deleteButton = document.createElement('BUTTON');
+
     listTable.appendChild(tr);
     tr.appendChild(tdName);
     tr.appendChild(tdValue);
     tr.appendChild(tdButton);
     tdButton.appendChild(deleteButton);
-    
+
     tdName.innerText = name;
     tdValue.innerText = value;
     deleteButton.innerText = 'Удалить';
@@ -99,39 +100,57 @@ function createCookieTr(name, value) {
 
     deleteButton.addEventListener('click', function () {
         deleteCookie(name);
+        cookiesUpdate();
     });
 }
 
-var cookiesArray = getCookies();
-
-function Cookies() {
+function cookiesUpdate(cookiesObject = getCookies()) {
     listTable.innerHTML = '';
-    for (var cookies in cookiesArray) {
-        createCookieTr(cookies, cookiesArray[cookies]);
-    }
-}
-function deleteCookies(name) {
-    var rows = listTable.children;
-    for (var item of rows) {
-        if (item.cells[0].innerText == name) {
-            item.remove();
-        }
+    for (let cookies in cookiesObject) {
+        createCookieTr(cookies, cookiesObject[cookies]);
     }
 }
 
-filterNameInput.addEventListener('keyup', function() {
-    let value = this.value.trim();
-    filterNameInput.innerText = "";
-    if (value){
-        filterNameInput.innerText = null;
-        for (var i = 0; i < cookiesArray.length; i++){
-            if (isMatching(cookiesArray[i].name, value)){
-                filterNameInput.innerText += cookiesArray[i].name + '\n';
-            }
+filterNameInput.addEventListener('keyup', function () {
+    let cookiesObject = getCookies(),
+        value = this.value.trim();
+    if (!value) {
+        return cookiesUpdate();
+    }
+    for (let name in cookiesObject) {
+        if (!(isMatching(name, value) || isMatching(cookiesObject[name], value))) {
+            delete cookiesObject[name];
+            cookiesUpdate(cookiesObject);
         }
     }
+
 });
 
 addButton.addEventListener('click', (e) => {
-});
+    let name = addNameInput.value,
+        value = addValueInput.value,
+        filter = filterNameInput.value,
+        oldCookies = getCookies();
 
+    for (let cookieName in oldCookies) {
+        if (name === cookieName) {
+            deleteCookie(name);
+            createCookie(name, value);
+            console.log('замена куки');
+            cookiesUpdate();
+            return;
+        }
+    }
+    if (!filter) {
+        createCookie(name, value);
+        createCookieTr(name, value);
+        console.log('добавление куки');
+    } else if (isMatching(name, filter) || isMatching(value, filter)) {
+        createCookie(name, value);
+        createCookieTr(name, value);
+        console.log('фильтр не пустой');
+    } else if (!(isMatching(name, filter) || isMatching(value, filter))) {
+        createCookie(name, value);
+        console.log('добавление куки с помощью фильтра ');
+    }
+});
